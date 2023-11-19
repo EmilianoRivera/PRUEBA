@@ -1,6 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, onSnapshot } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -22,11 +22,9 @@ const firebaseConfig = {
 
 };
 
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const reportesContainer = document.getElementById("reportes-container");
 
 
 const onGetReportes = (callback) => {
@@ -40,49 +38,39 @@ const onGetReportes = (callback) => {
     return unsubscribe;
 }
 
-
-const datosPost = {
-    imgURL : "",
-    ubi:"",
-    desc: "",
+// firebase.js
+export const datosPost = {
+    imgURL: [],
+    ubi: [],
+    desc: [],
 }
 
-window.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const unsubscribe = onGetReportes((querySnapshot) => {
-            reportesContainer.innerHTML = "";  // Limpiamos el contenedor antes de agregar nuevos elementos
+const cargarReportes = () => new Promise((resolve, reject) => {
+    const unsubscribe = onGetReportes((querySnapshot) => {
+        try {
+            datosPost.imgURL = [];
+            datosPost.ubi = [];
+            datosPost.desc = [];
+
             querySnapshot.forEach((doc) => {
                 const reporte = doc.data();
                 console.log("------------------------------")
-                datosPost.imgURL = reporte.imagenURL;
-                datosPost.ubi = reporte.ubicacion;
-                datosPost.desc = reporte.descripcion;
-                console.log(datosPost.imgURL)
-                console.log(datosPost.ubi)
-                console.log(datosPost.desc)
-
-                reportesContainer.innerHTML += `<div class="car card-body mt-2 border-primary"> 
-            <div>
-                <img src=" ${reporte.imagenURL}" heigth ="200" width="300">
-            </div>
-            <p>${reporte.ubicacion}</p>
-            <p>${reporte.descripcion}</p>
-        </div>`;
+                datosPost.imgURL.push(reporte.imagenURL);
+                datosPost.ubi.push(reporte.ubicacion);
+                datosPost.desc.push(reporte.descripcion);
             });
-        });
 
-        // Puedes usar `unsubscribe` para dejar de escuchar los cambios en algún momento
-        // Por ejemplo, si dejas la página o dejas de necesitar las actualizaciones en tiempo real
-        // unsubscribe();
-    } catch (error) {
-        console.error('Error al obtener reportes:', error);
-    }
+            console.log(datosPost); // Puedes usar estos datos o devolverlos en la promesa
+
+            // Puedes usar `unsubscribe` para dejar de escuchar los cambios en algún momento
+            // Por ejemplo, si dejas la página o dejas de necesitar las actualizaciones en tiempo real
+            // unsubscribe();
+
+            resolve();  // Resuelve la promesa cuando los datos se han cargado correctamente
+        } catch (error) {
+            reject(error);  // Rechaza la promesa si hay algún error
+        }
+    });
 });
 
-const enviarDatosPost = {
-    imagen: datosPost.imgURL,
-    ubicacionUsuario: datosPost.ubi,
-    descripcionBache: datosPost.desc
-};
-
-
+export { cargarReportes };

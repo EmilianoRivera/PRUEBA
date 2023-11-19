@@ -1,4 +1,4 @@
-
+/*
 function checkLoginState() {
     FB.getLoginStatus(function (response) {
         statusChangeCallback(response);
@@ -53,4 +53,4 @@ function testAPI() {
         document.getElementById('status').innerHTML =
             'Thanks for logging in, ' + response.name + '!';
     });
-}
+}*/
