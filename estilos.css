@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+
+.p-5 {
+    padding: 5rem !important;
+}
+
+.p-4 {
+    padding: 4rem !important;
+}
+
+.col-md-6 {
+    width: 50%;
+    float: left;
+}
+
+.card-body {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.fb-login-button {
+    margin-top: 1rem;
+}
+#status {
+    margin-top: 1rem;
+}
