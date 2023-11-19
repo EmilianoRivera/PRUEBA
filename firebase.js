@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
 import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -39,15 +40,30 @@ const onGetReportes = (callback) => {
     return unsubscribe;
 }
 
+
+const datosPost = {
+    imgURL : "",
+    ubi:"",
+    desc: "",
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
     try {
         const unsubscribe = onGetReportes((querySnapshot) => {
             reportesContainer.innerHTML = "";  // Limpiamos el contenedor antes de agregar nuevos elementos
             querySnapshot.forEach((doc) => {
                 const reporte = doc.data();
+                console.log("------------------------------")
+                datosPost.imgURL = reporte.imagenURL;
+                datosPost.ubi = reporte.ubicacion;
+                datosPost.desc = reporte.descripcion;
+                console.log(datosPost.imgURL)
+                console.log(datosPost.ubi)
+                console.log(datosPost.desc)
+
                 reportesContainer.innerHTML += `<div class="car card-body mt-2 border-primary"> 
             <div>
-                <img src=" ${reporte.imagenURL}" length ="100" width="100">
+                <img src=" ${reporte.imagenURL}" heigth ="200" width="300">
             </div>
             <p>${reporte.ubicacion}</p>
             <p>${reporte.descripcion}</p>
@@ -63,5 +79,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+const enviarDatosPost = {
+    imagen: datosPost.imgURL,
+    ubicacionUsuario: datosPost.ubi,
+    descripcionBache: datosPost.desc
+};
 
 
