@@ -25,8 +25,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-
 const onGetReportes = (callback) => {
     const query = collection(db, 'reportes');
 
@@ -44,20 +42,28 @@ export const datosPost = {
     ubi: [],
     desc: [],
 }
-
+const documentosProcesados = new Set();
 const cargarReportes = () => new Promise((resolve, reject) => {
     const unsubscribe = onGetReportes((querySnapshot) => {
         try {
-            datosPost.imgURL = [];
-            datosPost.ubi = [];
-            datosPost.desc = [];
+            if (querySnapshot.size > 0) {
+                datosPost.imgURL = [];
+                datosPost.ubi = [];
+                datosPost.desc = [];
+            }
 
             querySnapshot.forEach((doc) => {
                 const reporte = doc.data();
                 console.log("------------------------------")
-                datosPost.imgURL.push(reporte.imagenURL);
-                datosPost.ubi.push(reporte.ubicacion);
-                datosPost.desc.push(reporte.descripcion);
+                if (!documentosProcesados.has(doc.id)) {
+                    console.log("------------------------------")
+                    datosPost.imgURL.push(reporte.imagenURL);
+                    datosPost.ubi.push(reporte.ubicacion);
+                    datosPost.desc.push(reporte.descripcion);
+
+                    // Agrega el ID del documento a la lista de documentos procesados
+                    documentosProcesados.add(doc.id);
+                }
             });
 
             console.log(datosPost); // Puedes usar estos datos o devolverlos en la promesa
