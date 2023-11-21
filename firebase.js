@@ -1,4 +1,3 @@
-
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, onSnapshot } from "firebase/firestore";
 
@@ -36,13 +35,16 @@ const onGetReportes = (callback) => {
     return unsubscribe;
 }
 
-// firebase.js
+
 export const datosPost = {
     imgURL: [],
     ubi: [],
     desc: [],
 }
+
 const documentosProcesados = new Set();
+const publicacionesRealizadas = new Set(); // Nuevo conjunto para hacer un seguimiento de las publicaciones
+
 const cargarReportes = () => new Promise((resolve, reject) => {
     const unsubscribe = onGetReportes((querySnapshot) => {
         try {
@@ -54,29 +56,21 @@ const cargarReportes = () => new Promise((resolve, reject) => {
 
             querySnapshot.forEach((doc) => {
                 const reporte = doc.data();
-                console.log("------------------------------")
                 if (!documentosProcesados.has(doc.id)) {
-                    console.log("------------------------------")
                     datosPost.imgURL.push(reporte.imagenURL);
                     datosPost.ubi.push(reporte.ubicacion);
                     datosPost.desc.push(reporte.descripcion);
 
-                    // Agrega el ID del documento a la lista de documentos procesados
                     documentosProcesados.add(doc.id);
                 }
             });
 
-            console.log(datosPost); // Puedes usar estos datos o devolverlos en la promesa
-
-            // Puedes usar `unsubscribe` para dejar de escuchar los cambios en algún momento
-            // Por ejemplo, si dejas la página o dejas de necesitar las actualizaciones en tiempo real
-            // unsubscribe();
-
-            resolve();  // Resuelve la promesa cuando los datos se han cargado correctamente
+            console.log(datosPost);
+            resolve();
         } catch (error) {
-            reject(error);  // Rechaza la promesa si hay algún error
+            reject(error);
         }
     });
 });
 
-export { cargarReportes };
+export { cargarReportes, publicacionesRealizadas, documentosProcesados };

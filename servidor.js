@@ -1,4 +1,4 @@
-import { cargarReportes, datosPost } from './firebase.js';
+import { cargarReportes, datosPost, publicacionesRealizadas, documentosProcesados } from './firebase.js';
 import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
@@ -34,7 +34,12 @@ async function realizarPublicacion(text, img) {
 }
 
 const procesarReportes = async () => {
+    datosPost.imgURL = [];
+    datosPost.ubi = [];
+    datosPost.desc = [];
+
     await cargarReportes();
+
     // Ahora puedes obtener datosPost con la información actualizada
     const nuevosReportes = datosPost.ubi.map((ubi, index) => {
         const mensaje = `Bache reportado en: ${ubi} Descripción: ${datosPost.desc[index]}.  `;
@@ -48,33 +53,20 @@ const procesarReportes = async () => {
 const publicarNuevosReportes = async () => {
     try {
         const nuevosReportes = await procesarReportes();
-        // Realizar publicaciones solo para los nuevos reportes
+
+        // Realizar publicaciones solo para los nuevos reportes que no han sido publicados
         for (const { mensaje, Img } of nuevosReportes) {
-            await realizarPublicacion(mensaje, Img);
+            if (!publicacionesRealizadas.has(mensaje)) {
+                await realizarPublicacion(mensaje, Img);
+                publicacionesRealizadas.add(mensaje); // Agregar el identificador a las publicaciones realizadas
+            }
         }
+
+        // Limpiar documentosProcesados después de realizar las publicaciones
+        documentosProcesados.clear();
     } catch (error) {
         console.error('Error al procesar y publicar nuevos reportes:', error);
     }
 };
-
 // Ejecutar la función para procesar y publicar nuevos reportes cada 5 minutos (300,000 milisegundos)
-setInterval(publicarNuevosReportes, 10000);
-
-
-  /*
-cargarReportes()
-.then(() => {
-    // Luego, configurar un temporizador para ejecutar la función cada 5 segundos
-    setInterval(async () => {
-        await cargarReportes();
-        // Ahora puedes obtener datosPost con la información actualizada
-        const mensajes = datosPost.ubi.map((ubi, index) => {
-            const mensaje = `Bache reportado en: ${ubi} Descripción: ${datosPost.desc[index]}. @Soy de Azcapotzalco(CDMX) `;
-            const Img = `${datosPost.imgURL[index]}`; //no añadir nada de texto aca, sino se jode todo xd
-            realizarPublicacion(mensaje, Img);
-        });
-    }, 6000); // 3600000 milisegundos = 1 hora
-})
-.catch((error) => {
-    console.error('Error al cargar los reportes:', error);
-});*/
+setInterval(publicarNuevosReportes, 15000);
