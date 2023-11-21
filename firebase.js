@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, onSnapshot } from "firebase/firestore";
+import { getFirestore, collection, onSnapshot, addDoc, setDoc, doc, updateDoc  } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -24,6 +24,22 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+
+
+export async function agregarEstadoNoPublicado(docId) {
+    const reporteRef = doc(db, 'reportes', docId);
+    await setDoc(reporteRef, { estado: 'no publicado' }, { merge: true });
+}
+
+export async function actualizarEstadoPublicado(docId) {
+    const reporteRef = doc(db, 'reportes', docId);
+    await updateDoc(reporteRef, { estado: 'publicado' });
+}
+
+
+
+
 const onGetReportes = (callback) => {
     const query = collection(db, 'reportes');
 
@@ -40,6 +56,7 @@ export const datosPost = {
     imgURL: [],
     ubi: [],
     desc: [],
+    docIds: []
 }
 
 const documentosProcesados = new Set();
@@ -52,6 +69,8 @@ const cargarReportes = () => new Promise((resolve, reject) => {
                 datosPost.imgURL = [];
                 datosPost.ubi = [];
                 datosPost.desc = [];
+                datosPost.docIds = [];
+
             }
 
             querySnapshot.forEach((doc) => {
@@ -60,6 +79,9 @@ const cargarReportes = () => new Promise((resolve, reject) => {
                     datosPost.imgURL.push(reporte.imagenURL);
                     datosPost.ubi.push(reporte.ubicacion);
                     datosPost.desc.push(reporte.descripcion);
+                    datosPost.docIds.push(doc.id);
+                
+
 
                     documentosProcesados.add(doc.id);
                 }
